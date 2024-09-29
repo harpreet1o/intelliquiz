@@ -8,7 +8,7 @@ function QuizComponent() {
   const navigate = useNavigate();
   const { quiz, setQuiz } = useContext(QuizContext);
   const [missing, setMissing] = useState(-1);
-  console.log(quiz);
+  // console.log(quiz);
   useEffect(() => {
     checkQuiz();
     updateAdvancedQuiz();
@@ -47,7 +47,7 @@ function QuizComponent() {
     }
   }
   function passValue(value) {
-    console.log(value);
+    // console.log(value);
     let updatedQuizMaterial = [...quizMaterial];
     questionValue.userResponse = value;
     questionValue.attempted = true;

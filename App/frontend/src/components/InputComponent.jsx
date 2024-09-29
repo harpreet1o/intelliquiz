@@ -1,11 +1,11 @@
 import { useContext, useState, useRef } from "react";
-import { quizRequest } from "../api/gptapi";
 import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
 import Divider from "../components/Divider";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function InputComponent() {
   const { quiz, setQuiz } = useContext(QuizContext);
@@ -40,21 +40,26 @@ function InputComponent() {
 
   const gptCallResponse = async () => {
     setQuiz(["loading"]);
-    console.log(gptInput);
-    const res = await quizRequest(numberQuestions, questionType, gptInput);
-    console.log(res);
+    // console.log(gptInput);
+    const response= await axios.post("http://localhost:3000/gettingQuiz",{
+      numberQuestions: numberQuestions,
+      questionType: questionType,       
+      gptInput: gptInput                
+    })
+   const res=response.data;
+
     let jres;
     if (typeof res === "string") {
       jres = JSON.parse(res);
     } else {
       jres = res;
     }
-    console.log(jres.questions);
+    // console.log(jres.questions);
     setQuiz(jres.questions);
   };
   function gettingFileValue() {
     const fileValue = fileInputRef.current.files[0];
-    console.log(fileValue);
+    // console.log(fileValue);
     const extract = async () => {
       setGptInput("loading....");
       const res = await extractText(fileValue);
@@ -65,7 +70,7 @@ function InputComponent() {
 
   function getQuiz() {
     gptCallResponse();
-    console.log("submitted Quiz");
+    // console.log("submitted Quiz");
   }
 
   function attemptQuiz() {
@@ -182,8 +187,8 @@ function InputComponent() {
         </div>
 
         <Divider />
-        <div className="flex justify-between">
-          <div className="w-225 flex flex-col">
+        <div className="justify-between sm:flex">
+          <div className="w-225 flex flex-col mb-8">
             <h1 className="text-header text-dPurple mb-5">Question Options</h1>
             <div className="flex justify-between mb-3">
               <label

@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "../context/QuizContext";
-import { feedbackRequest } from "../api/gptapi";
 import { useNavigate } from "react-router-dom";
 import Divider from "./Divider";
 import LoadingSpinner from "./LoadingSpinner";
 import { downloadQuiz } from "../api/pdfapi";
 import logo from "../components/images/logo.png";
+import axios from "axios";
 
 function Result() {
   const { quiz } = useContext(QuizContext);
@@ -37,7 +37,8 @@ function Result() {
   const getFeedback = async () => {
     const wrongQuestions = quiz.filter((q) => q.answer !== q.userResponse);
     const rightQuestions = quiz.filter((q) => q.answer === q.userResponse);
-    const feedback = await feedbackRequest(wrongQuestions, rightQuestions);
+    const feedbackdata = await axios.post("http://localhost:3000/getFeedback",{wrongQuestions,rightQuestions})
+    const feedback= feedbackdata.data;
     setFeedback(feedback);
   };
 

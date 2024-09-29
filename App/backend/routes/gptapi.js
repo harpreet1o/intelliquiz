@@ -1,12 +1,22 @@
+import express from "express";
+import 'dotenv/config';
 import axios from "axios";
 
-const jsonTemplate =
-  "{questions: [{questions: [{'question': 'What is the capital city of canada?','options': ['vancouver', 'ottawa', 'winnipeg', 'toronto'],'answer': 'ottawa','hint':'','explanation':''},{'question': 'Capital city of canada is ottawa','options': ['true', 'false'],'answer': 'true','hint':'','explanation':'']}";
+const router=express.Router();
+  router.post("/gettingQuiz",async (req,res)=>{
+    console.log(req.body)
+    res.json(await quizRequest(req.body.numberQuestions,req.body.questionType,req.body.gptInput));
+    })
+    router.post("/getFeedback",async(req,res)=>{
+        res.json(await feedbackRequest(req.body.wrongQuestions, req.body.rightQuestions))
+    })
 
+    const jsonTemplate =
+  "{questions: [{questions: [{'question': 'What is the capital city of canada?','options': ['vancouver', 'ottawa', 'winnipeg', 'toronto'],'answer': 'ottawa','hint':'','explanation':''},{'question': 'Capital city of canada is ottawa','options': ['true', 'false'],'answer': 'true','hint':'','explanation':'']}";
 // function for generating prompt to generate the quiz
 function generateQuiz(numberQuestions, questionType, gptInput) {
   //return `generate ${numberQuestions} questions of type ${questionType} based on this text: ${gptInput}. Return answer as json like: ${jsonTemplate} replacing single quotes with double quotes`;
-  return `generate ${numberQuestions} questions of type ${questionType} based on this text: ${gptInput}. Return answer as json like: ${jsonTemplate} replacing single quotes with double quotes.  Provide a slight indication (or the primary cause) as a hint for each question and do not reveal the answer directly. Limit to 15 words. Also explain the answer to the question in not more than 50 words, do not refer to the text in any of the explanations and hints, you may use your database to explain. 
+  return `generate ${numberQuestions} questions of type ${questionType} based on this text: ${gptInput}. Return answer like this ${jsonTemplate} replacing single quotes with double quotes.  Provide a slight indication (or the primary cause) as a hint for each question and do not reveal the answer directly. Limit to 15 words. Also explain the answer to the question in not more than 50 words, do not refer to the text in any of the explanations and hints, you may use your database to explain. 
   (Refer to this example for hint:{ Question: What is the capital city of canada?;Hint: This city sits on the border of Ontario and Quebec.}, {Question: Canada shares its longest international land border with Mexico.; Hint: Look to the north for Canada's longest international land border.}`;
 }
 
@@ -20,13 +30,13 @@ function generateFeedback(wrongQuestions, rightQuestions) {
 }
 
 //function to call chatgpt to generate quiz
-export const quizRequest = async (numberQuestions, questionType, gptInput) => {
-  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
+ const quizRequest = async (numberQuestions, questionType, gptInput) => {
+  const OPENAI_API_KEY = process.env.VITE_OPENAI_KEY;
 
   const prompt = generateQuiz(numberQuestions, questionType, gptInput);
 
   const data = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],
   };
 
@@ -42,21 +52,19 @@ export const quizRequest = async (numberQuestions, questionType, gptInput) => {
       }
     );
     console.log(response.data.choices[0].message.content);
-    // setGptResponse(response.data.choices[0].message.content);
     return response.data.choices[0].message.content;
   } catch (error) {
     console.error("Error: ", error);
   }
 };
-
 //function to call chatgpt to generate feedback
-export const feedbackRequest = async (wrongQuestions, rightQuestions) => {
-  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
+ const feedbackRequest = async (wrongQuestions, rightQuestions) => {
+  const OPENAI_API_KEY = process.env.VITE_OPENAI_KEY;
 
   const prompt = generateFeedback(wrongQuestions, rightQuestions);
 
   const data = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],
   };
 
@@ -72,9 +80,12 @@ export const feedbackRequest = async (wrongQuestions, rightQuestions) => {
       }
     );
     console.log(response.data.choices[0].message.content);
+    console.log(response.data.choices[0].message.content.questions);
+
     // setGptResponse(response.data.choices[0].message.content);
     return response.data.choices[0].message.content;
   } catch (error) {
     console.error("Error: ", error);
   }
 };
+export default router;

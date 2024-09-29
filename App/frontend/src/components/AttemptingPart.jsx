@@ -10,7 +10,7 @@ export default function AttemptingPart({ question, passValue, index }) {
   }, [question]);
 
   const handleOptionSelect = (option) => {
-    console.log(option);
+    // console.log(option);
     setSelectedValue(option);
     passValue(option);
   };
@@ -60,7 +60,7 @@ export default function AttemptingPart({ question, passValue, index }) {
 // FlipCard Component
 function FlipCard({ text, backText }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  console.log(text);
+  // console.log(text);
   function handleClick() {
     setIsFlipped(!isFlipped);
   }

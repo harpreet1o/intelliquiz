@@ -10,6 +10,8 @@ const generateAccessToken = async () => {
     console.log("generating access token...");
 
     const apiURL = "https://pdf-services-ue1.adobe.io/token";
+    console.log(clientID);
+    console.log(clientSecret)
 
     const data = {
         "client_id": clientID,
