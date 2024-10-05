@@ -3,6 +3,9 @@ import 'dotenv/config';
 import axios from "axios";
 
 const router=express.Router();
+router.post("/getpdf",async(req,res)=>{
+  
+})
   router.post("/gettingQuiz",async (req,res)=>{
     console.log(req.body)
     res.json(await quizRequest(req.body.numberQuestions,req.body.questionType,req.body.gptInput));
